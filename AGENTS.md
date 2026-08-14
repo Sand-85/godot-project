@@ -82,12 +82,12 @@ cd godot-project
 2. Agent 阅读 [DEVELOPMENT.md](./DEVELOPMENT.md) 与相关代码（场景 / 脚本 / 资源）；
 3. **Agent 优先检索库内可复用资源**：检查 `modules/` 已有模块、`scripts/` 共享层、`docs/RESOURCES.md` 资源清单、`docs/` 功能记录——存在可复用实现则直接复用（经 glue 接线），**禁止重复造轮子**；确认无可复用资源后才新建；
 4. Agent 实现功能（GDScript 为主，遵循 §5 代码规范与 §6 高性能约束）；
-4. Agent 自测验证：
+5. Agent 自测验证：
    - `godot --headless --path .` 确认项目可加载无报错；
    - 跑相关测试（`tests/` 下，或新增 `test_*.gd`）；
    - 涉及渲染 / 交互的功能，用编辑器或实际运行人工验证（或说明验证方式）；
-5. 使用者验收；
-6. （可选）Agent 提交 PR 惠及上游（遵守 DEVELOPMENT.md §2 全部要求）。
+6. 使用者验收；
+7. （可选）Agent 提交 PR 惠及上游（遵守 DEVELOPMENT.md §2 全部要求）。
 
 ### 4.2 新增功能的标准形态（模块化 + glue 架构）
 
