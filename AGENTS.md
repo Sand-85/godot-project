@@ -42,10 +42,11 @@ cd godot-project
 ├── project.godot            # 项目配置（Godot 4.x 文本格式）
 ├── export_presets.cfg       # 多平台导出预设
 ├── icon.svg                 # 项目图标
-├── scenes/                  # 场景（.tscn）
-├── scripts/                 # GDScript（.gd）
-├── assets/                  # 美术 / 音频 / 字体等资源
-├── autoload/                # 全局单例脚本（Autoload）
+├── modules/                 # 功能模块（模块化 + glue 架构：每模块自包含场景/脚本/资源/数据）
+├── glue/                    # 胶水层：模块接线 / 信号总线 / 服务注册表（只连接，不含业务逻辑）
+├── scripts/                 # 跨模块共享的纯逻辑类（class_name，glue/基础设施）
+├── assets/                  # 美术 / 音频 / 字体等全局资源
+├── autoload/                # 全局单例（glue 层：消息总线 / 服务注册，不堆积业务逻辑）
 ├── addons/                  # Godot 插件（如测试框架 GUT / gdUnit4）
 ├── tests/                   # 测试脚本
 ├── docs/                    # 项目文档
@@ -87,12 +88,17 @@ cd godot-project
 5. 使用者验收；
 6. （可选）Agent 提交 PR 惠及上游（遵守 DEVELOPMENT.md §2 全部要求）。
 
-### 4.2 新增功能的标准形态
+### 4.2 新增功能的标准形态（模块化 + glue 架构）
 
-- **场景 + 脚本**：功能以场景（`.tscn`）为载体，逻辑写在场景脚本或 `scripts/` 下的 `class_name` 类中；
-- **可复用逻辑**：抽到 `scripts/` 纯逻辑类（不依赖场景树），便于单测；
-- **全局状态**：用 Autoload 单例（`autoload/`），在 `project.godot` 的 `[autoload]` 段注册；
-- **信号解耦**：跨场景通信用信号 / 信号总线，禁止硬引用耦合。
+- **模块优先**：新功能默认做成**独立可复用模块**——在 `modules/<module_name>/` 目录内自带场景（`.tscn`）+ 脚本 + 资源 + 数据，模块自包含、可整体复用。
+- **模块只暴露公开接口**：模块通过 `class_name` 公共类、信号、公开方法对外提供能力；内部实现（私有成员、内部节点、内部场景）不对外可见。
+- **模块间协作走 glue**：模块之间**禁止直接引用**（不实例化对方内部类、不引用对方场景/资源、不 `get_node` 对方内部）。需要协作时：
+  - 模块发信号 → glue（信号总线 / Autoload）转发 → 目标模块响应；
+  - 或经 glue 服务注册表获取对方公开接口。
+- **glue 保持薄**：`glue/` 与 Autoload 只做接线 / 消息路由 / 服务注册，不含业务逻辑、不承载状态。
+- **共享逻辑**：跨模块复用的纯逻辑类（`class_name`，不依赖场景树）放 `scripts/` 共享层，供各模块复用。
+- **全局状态**：用 Autoload 单例（`autoload/`，glue 层），在 `project.godot` 的 `[autoload]` 段注册；禁止在 Autoload 中堆积业务逻辑。
+- **信号解耦**：模块间通信用信号 / 信号总线，禁止硬引用耦合。
 
 ### 4.3 新增资源 / 素材
 

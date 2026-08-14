@@ -15,6 +15,7 @@
 - **美术与光照人类掌控**：光照方案、材质、色调、美术资源、音频（音效 / 音乐 / 混音）等创作与视觉听觉表现的**决策权归人类**——Agent 不擅自创建或修改，可提供技术建议，创意决策由人类主导。
 - **多平台**：目标平台为 **Windows 桌面（Windows 10 / 11）** 与 **Android 移动端**，开发时默认考虑两平台兼容。
 - **高性能**：以 60 FPS 为基准，遵循 Godot 性能实践（静态类型、对象池、渲染优化、多线程），避免性能瓶颈。
+- **模块化 + glue 架构**：功能模块化、可复用，模块之间**只通过 glue（胶水）代码链接**——模块自包含、只暴露公开接口，glue 层负责接线与消息路由，禁止模块间直接耦合（详见 [DEVELOPMENT.md](./DEVELOPMENT.md) §5）。
 
 ---
 
@@ -51,10 +52,11 @@ godot --path .
 ├── project.godot            # Godot 项目配置（4.x 文本格式）
 ├── export_presets.cfg       # 多平台导出预设
 ├── icon.svg                 # 项目图标
-├── scenes/                  # 场景（.tscn）
-├── scripts/                 # GDScript（.gd）
-├── assets/                  # 美术 / 音频 / 字体等资源
-├── autoload/                # 全局单例脚本（Autoload）
+├── modules/                 # 功能模块（模块化 + glue 架构：每模块自包含场景/脚本/资源/数据）
+├── glue/                    # 胶水层：模块接线 / 信号总线 / 服务注册表（只连接，不含业务逻辑）
+├── scripts/                 # 跨模块共享的纯逻辑类（class_name，glue/基础设施）
+├── assets/                  # 美术 / 音频 / 字体等全局资源（模块私有资源放模块目录内）
+├── autoload/                # 全局单例（glue 层：消息总线 / 服务注册，不堆积业务逻辑）
 ├── addons/                  # Godot 插件（如测试框架 GUT / gdUnit4）
 ├── tests/                   # 测试脚本（GUT / gdUnit4，headless 可跑）
 ├── docs/                    # 项目文档
