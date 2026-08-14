@@ -45,7 +45,7 @@ cd godot-project
 ├── modules/                 # 功能模块（模块化 + glue 架构：每模块自包含场景/脚本/资源/数据）
 ├── glue/                    # 胶水层：模块接线 / 信号总线 / 服务注册表（只连接，不含业务逻辑）
 ├── scripts/                 # 跨模块共享的纯逻辑类（class_name，glue/基础设施）
-├── assets/                  # 美术 / 音频 / 字体等全局资源
+├── assets/                  # 美术资源目录（本地提供，不入库——见 §4.3）
 ├── autoload/                # 全局单例（glue 层：消息总线 / 服务注册，不堆积业务逻辑）
 ├── addons/                  # Godot 插件（如测试框架 GUT / gdUnit4）
 ├── tests/                   # 测试脚本
@@ -100,9 +100,13 @@ cd godot-project
 - **全局状态**：用 Autoload 单例（`autoload/`，glue 层），在 `project.godot` 的 `[autoload]` 段注册；禁止在 Autoload 中堆积业务逻辑。
 - **信号解耦**：模块间通信用信号 / 信号总线，禁止硬引用耦合。
 
-### 4.3 新增资源 / 素材
+### 4.3 资源管理（Asset 不入库）
 
-- 纹理、音频、模型放入 `assets/` 对应子目录，Godot 自动导入；
+- **GitHub 仓库不提交任何贴图、音频、模型、字体等美术资源**——只保留功能实现代码与封装（GDScript / `.tscn` / `.tres` / glue / 文档）。
+- 美术资源由使用者（人类）本地提供，放入 `assets/`（全局）或 `modules/<模块名>/assets/`（模块私有）；这两类目录及常见资源格式已被 .gitignore 排除，Agent 提交时不会夹带 Asset。
+- 场景引用资源一律用 `@export` 暴露路径，不写死；资源缺失时用占位（`PlaceholderTexture2D` / 代码生成占位纹理）保证项目可加载、headless 测试可运行。
+- 新增资源需求在 `docs/RESOURCES.md` 登记（路径、用途、建议规格），供使用者按清单放置。
+- 唯一例外：`icon.svg`（Godot 项目必需图标）随仓库提交。
 - 大资源注意导入设置（压缩 / 流式），遵守 DEVELOPMENT.md §6 内存约束；
 - **禁止**提交 `.godot/` 缓存目录与临时文件。
 

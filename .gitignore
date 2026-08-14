@@ -2,6 +2,50 @@
 # Godot 4.x 自动生成的导入缓存 / 编辑器数据（不入库）
 .godot/
 
+# ── 美术资源（不入库，由使用者本地提供）──
+# 仓库仅保留功能实现代码与封装；贴图/音频/模型/字体等 Asset 一律不提交
+# 全局资源目录
+assets/
+# 模块私有资源目录
+modules/*/assets/
+
+# 图片 / 贴图
+*.png
+*.jpg
+*.jpeg
+*.webp
+*.tga
+*.bmp
+*.exr
+*.hdr
+*.ktx
+*.dds
+*.svg
+!icon.svg
+# 音频
+*.ogg
+*.wav
+*.mp3
+*.flac
+*.aac
+# 模型
+*.glb
+*.gltf
+*.fbx
+*.obj
+*.dae
+*.blend
+*.blend1
+# 字体
+*.ttf
+*.otf
+*.woff
+*.woff2
+# 视频
+*.mp4
+*.webm
+*.avi
+
 # ── 敏感信息（绝不入库）──
 *.key
 *.pem

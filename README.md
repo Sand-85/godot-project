@@ -51,11 +51,11 @@ godot --path .
 .
 ├── project.godot            # Godot 项目配置（4.x 文本格式）
 ├── export_presets.cfg       # 多平台导出预设
-├── icon.svg                 # 项目图标
+├── icon.svg                 # 项目图标（唯一入库的 svg，项目必需）
 ├── modules/                 # 功能模块（模块化 + glue 架构：每模块自包含场景/脚本/资源/数据）
 ├── glue/                    # 胶水层：模块接线 / 信号总线 / 服务注册表（只连接，不含业务逻辑）
 ├── scripts/                 # 跨模块共享的纯逻辑类（class_name，glue/基础设施）
-├── assets/                  # 美术 / 音频 / 字体等全局资源（模块私有资源放模块目录内）
+├── assets/                  # 美术资源目录（本地提供，不入库——见「资源管理」）
 ├── autoload/                # 全局单例（glue 层：消息总线 / 服务注册，不堆积业务逻辑）
 ├── addons/                  # Godot 插件（如测试框架 GUT / gdUnit4）
 ├── tests/                   # 测试脚本（GUT / gdUnit4，headless 可跑）
@@ -66,6 +66,18 @@ godot --path .
 ```
 
 > `.godot/` 目录（Godot 导入缓存）已被 .gitignore 排除，不提交。
+
+## 🎨 资源管理（Asset 不入库）
+
+**GitHub 仓库只提交功能实现代码与封装**（GDScript / 场景结构 `.tscn` / 配置 `.tres` / glue / 文档），**不包含任何贴图、音频、模型、字体等美术资源**：
+
+- 所有美术资源（贴图 / 音频 / 模型 / 字体）由**使用者（人类）本地提供**，放入 `assets/`（全局）或 `modules/<模块名>/assets/`（模块私有）；
+- 资源目录与常见资源格式（png/jpg/webp/ogg/wav/glb/fbx/ttf 等）已被 .gitignore 排除，**提交到 GitHub 的代码中不会夹带任何 Asset**；
+- 场景通过 `@export` 引用资源，不写死路径；资源缺失时用占位（PlaceholderTexture2D / 代码生成占位纹理）保证项目可加载；
+- 资源规格 / 用途清单记录在 `docs/RESOURCES.md`（路径、用途、建议规格），供使用者按清单放置资源；
+- 唯一例外：`icon.svg`（Godot 项目必需图标）随仓库提交。
+
+> 约定详见 [DEVELOPMENT.md](./DEVELOPMENT.md) §5「资源管理」与 §8 自检清单。
 
 ## 🖥 多平台支持
 
