@@ -1,0 +1,22 @@
+# ── Godot 项目 ──
+# Godot 4.x 自动生成的导入缓存 / 编辑器数据（不入库）
+.godot/
+
+# ── 敏感信息（绝不入库）──
+*.key
+*.pem
+secrets/
+.env
+.env.*
+
+# ── 编辑器/系统 ──
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ── 构建产物 ──
+build/
+export/
+*.tmp
+*.bak
