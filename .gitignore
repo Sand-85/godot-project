@@ -53,6 +53,14 @@ secrets/
 .env
 .env.*
 
+# ── Agent 工具链（agent/ 只提交可复用的脚本/配置/文档，中间产物不入库）──
+agent/.cache/
+agent/tmp/
+agent/logs/
+agent/output/
+agent/*.log
+agent/*.tmp
+
 # ── 编辑器/系统 ──
 .vscode/
 .idea/

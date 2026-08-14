@@ -16,6 +16,7 @@
 - **多平台**：目标平台为 **Windows 桌面（Windows 10 / 11）** 与 **Android 移动端**，开发时默认考虑两平台兼容。
 - **高性能**：以 60 FPS 为基准，遵循 Godot 性能实践（静态类型、对象池、渲染优化、多线程），避免性能瓶颈。
 - **模块化 + glue 架构**：功能模块化、可复用，模块之间**只通过 glue（胶水）代码链接**——模块自包含、只暴露公开接口，glue 层负责接线与消息路由，禁止模块间直接耦合；**实现功能前优先复用库内已有模块 / 共享类 / 资源，禁止重复造轮子**（详见 [DEVELOPMENT.md](./DEVELOPMENT.md) §5）。
+- **工程独立性（人类随时可人工接管）**：Agent 的工具链与 Godot 工程文件物理隔离、互不依赖——Agent 自动化 / 工具 / 专属文件只放仓库根级 `agent/` 目录，不混入工程；工程不引用 `agent/` 内任何内容；删除 `agent/` 后工程仍可正常打开、加载、运行。人类可随时直接在 Godot 编辑器中人工接管开发，Agent 不持有独占锁、不留「必须由 Agent 维护」的文件（详见 [AGENTS.md](./AGENTS.md) §4.5）。
 
 ---
 
@@ -60,6 +61,7 @@ godot --path .
 ├── addons/                  # Godot 插件（如测试框架 GUT / gdUnit4）
 ├── tests/                   # 测试脚本（GUT / gdUnit4，headless 可跑）
 ├── docs/                    # 项目文档
+├── agent/                   # Agent 工具链（自动化/工具/专属文件；与工程隔离，工程不引用——见 AGENTS.md §4.5）
 ├── AGENTS.md                # Agent 配置引导
 ├── DEVELOPMENT.md           # 开发规范
 └── README.md

@@ -7,6 +7,8 @@
 ## 1. 环境准备（Agent 必读）
 
 > ⚠️ **人工操作边界**：**Godot 的安装**与**项目骨架（`project.godot` / `scenes/` / `scripts/` 等）的创建**由使用者（人类）**手动完成**。Agent **不代为安装 Godot、不代为创建骨架**，只提供操作指引与就绪检查（如 `godot --version` 验证安装结果）。
+>
+> 🤝 **工程独立性保证**：Agent 的工具链与 Godot 工程文件物理隔离、互不依赖，工程始终可由人类直接在 Godot 中人工接管（见 §4.5）。Agent 的自动化 / 工具 / 专属文件只放 `agent/` 目录，不混入工程；工程不引用 `agent/` 内任何内容。
 
 ### 1.1 安装 Godot 4.5+（人工操作）
 
@@ -34,6 +36,16 @@ cd godot-project
 - 由使用者（人类）在 Godot 编辑器中创建项目骨架（`project.godot`、`icon.svg`、主场景、`scenes/` / `scripts/` / `assets/` 等目录），或用 `godot --path . --editor` 打开已有目录初始化。
 - Agent **不代为创建骨架**；骨架就绪后，Agent 才在其上进行开发。
 - Agent 负责的就绪检查：确认 `project.godot` 存在且 `godot --path . --editor --quit` 能正常完成资源导入（纹理 / 音频 / 字体等），`.godot/` 缓存目录生成（已被 .gitignore 排除）后即可开始开发。
+- ⚠️ **创建项目必须询问存放路径**：使用者要求 Agent 创建 / 初始化 Godot 项目时，Agent **必须先询问项目存放路径**（本地绝对路径），确认路径后再执行（Agent 职责内）的操作；**禁止**在未确认路径时擅自假定 / 猜测路径创建项目。指引中给出的示例路径仅是示意，不代表实际存放位置。Agent 提供的操作指引与命令中的路径须以使用者确认的路径为准。
+
+### 1.4 Godot MCP 检测（可选，建议）
+
+> godot-mcp 是让 AI Agent 与 Godot 编辑器交互的 MCP 服务（通常以 Godot 插件形式安装到 `addons/`）。启用后 Agent 可直接调用 Godot 编辑器能力（场景编辑 / 运行 / 调试输出等）。**非强制依赖**：未安装时 Agent 仍可用命令行方式（`godot --path .` 等）完成开发与验证。
+
+- **检测**：Agent 对工程进行操作前（尤其涉及编辑器交互时），应先检测工程是否安装了 godot-mcp——检查 `addons/` 下是否存在 godot-mcp 相关插件目录 / `plugin.cfg`（如 `res://addons/godot-mcp/`），以及 `project.godot` 的 `[editor_plugins]` / MCP 相关配置是否启用；同时可询问使用者当前使用的 AI 工具链是否已配置 godot-mcp 的 MCP server。
+- **未安装 → 请求安装（Agent 可介入代替用户处理）**：检测到未安装时，Agent **应明确告知使用者并请求安装** godot-mcp（说明用途与收益），并给出安装指引（如从 Godot 编辑器 AssetLib 搜索 / 按 godot-mcp 项目 README 安装插件并配置 MCP server）。**Agent 可介入代替用户处理安装**：经使用者确认后，Agent 可代为执行安装流程（下载插件到 `addons/`、启用插件、配置 MCP server 等），但**必须**：① 先征得使用者同意，明确告知 Agent 将代替其执行安装；② 安装属工程变更，遵循工程独立性约定（插件入 `addons/`，Agent 专属工具与中间产物不入工程）；③ 安装后向使用者报告结果并重新检测确认。
+- **安装后检测**：使用者确认安装后，Agent 重新检测确认可用（`addons/` 下插件存在且已启用 / MCP server 可连接），再决定是否通过 godot-mcp 进行编辑器交互开发。
+- **不可用时降级**：若使用者选择不安装或安装失败，Agent 不得阻塞开发，应降级为纯命令行方式（`godot --headless --path .` 等）继续，并在交接文档中注明。
 
 ## 2. 项目结构速览
 
@@ -50,6 +62,7 @@ cd godot-project
 ├── addons/                  # Godot 插件（如测试框架 GUT / gdUnit4）
 ├── tests/                   # 测试脚本
 ├── docs/                    # 项目文档
+├── agent/                   # Agent 工具链（自动化/工具/专属文件，与工程隔离，工程不引用——见 §4.5）
 ├── AGENTS.md                # 本文档
 ├── DEVELOPMENT.md           # 开发规范
 └── README.md
@@ -117,6 +130,23 @@ cd godot-project
 - 光照方案、材质、色调、美术资源、音频（音效 / 音乐 / 混音）等创作与视觉听觉表现的**主导权归人类**：Agent 不得擅自创建 / 修改 / "优化"。
 - Agent 可做：技术实现与性能建议（渲染优化、资源格式建议、音频流式加载等），但需提交方案供人类确认后再实施。
 - 涉及上述领域的改动需在 PR 描述中注明已获人类确认（DEVELOPMENT.md §1）。
+
+### 4.5 Agent 工具链与 Godot 工程独立性（人类随时可人工接管）
+
+**原则**：Agent 的工具链（自动化脚本、工具、Agent 专属文件）与 Godot 工程文件**物理隔离、互不依赖**。Godot 工程必须始终保持「脱离 Agent 工具链也能正常打开、加载、运行」的自洽状态，保证人类可随时在 Godot 编辑器中人工接管，不受 Agent 的任何前置条件限制。
+
+**隔离约定**：
+
+- Agent 专属内容统一放在仓库根级独立目录 `agent/`（自动化脚本、工具、Agent 专属数据与交接文档），**禁止**混入 Godot 工程的 `scenes/` / `scripts/` / `modules/` / `glue/` / `autoload/` / `tests/` 等目录；
+- Godot 工程文件（场景 / 脚本 / 资源 / `project.godot` / `export_presets.cfg`）**禁止引用 `res://agent/` 下的任何内容**——Agent 工具链是工程外部的旁挂设施，不是工程的一部分；工程代码不得 `load()` / `preload()` 或访问 `agent/` 内文件；
+- 删除 / 停用 `agent/` 及其工具后，`godot --path . --editor` 与 `godot --path .` 必须仍然正常（无缺失脚本 / 资源 / Autoload 报错）；
+- Agent 的中间产物（缓存、临时文件、生成数据）只放 `agent/` 内部并遵守 `.gitignore`，不污染工程目录。
+
+**人类随时接管**：
+
+- 任意时刻，人类可直接打开 Godot 编辑器接管工程；Agent 不持有任何独占锁、不占用任何「必须由 Agent 维护」的工程文件；
+- Agent 交还控制权时（完成任务 / 被中断 / 人类接管），应通过 commit 或 `git status` 说明当前改动状态，并在 `agent/` 交接文档中记录：当前进度、未提交内容、下一步建议，使人类（或接续的 Agent）可无缝续作；
+- 人类接管后可任意手工修改工程；Agent 重新介入时先读取现状（`git log` / `git status` / 工程文件 / 交接文档）再继续，不得基于过期认知盲目改动。
 
 ## 5. 环境变量（可选覆盖）
 
